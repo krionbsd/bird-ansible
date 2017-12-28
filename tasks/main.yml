@@ -12,11 +12,37 @@
   tags:
     - install
 
-- name: Add bird configuration
+- name: Set fact for automatically enabling networks (IPv4)
+  set_fact:
+    bird_ipv4_enabled: "{{ ansible_default_ipv4 is defined | bool }}"
+  when:
+    - "bird_ipv4_enabled == 'detect'"
+  tags:
+    - bird-config
+    - bird-init
+
+- name: Set fact for automatically enabling networks (IPv6)
+  set_fact:
+    bird_ipv6_enabled: >-
+      {{ (ansible_default_ipv6 is defined
+         and ansible_default_ipv6['scope'] is defined
+         and ansible_default_ipv6['scope'] == 'global') | bool }}
+  when:
+    - "bird_ipv6_enabled == 'detect'"
+  tags:
+    - bird-config
+    - bird-init
+
+- name: Drop bird configuration files
   template:
     src: bird.conf.j2
-    dest: /etc/bird/bird.conf
-    mode: '0644'
-  notify: restart bird
+    dest: "{{ item.config_file }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  register: bird_results
+  when: "item.enabled | bool"
+  with_items: "{{ bird_configs }}"
   tags:
-    - configure
+    - bird-config
+
