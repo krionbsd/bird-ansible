@@ -1,0 +1,22 @@
+---
+
+- include: install-epel.yml
+  when: ansible_os_family == 'RedHat' and bird_install_epel
+  tags:
+    - install
+
+- name: Install bird
+  package:
+    name: bird
+    state: present
+  tags:
+    - install
+
+- name: Add bird configuration
+  template:
+    src: bird.conf.j2
+    dest: /etc/bird/bird.conf
+    mode: '0644'
+  notify: restart bird
+  tags:
+    - configure

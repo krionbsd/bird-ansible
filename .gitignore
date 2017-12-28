@@ -1,0 +1,11 @@
+# Ignore the Python cache files
+__pycache__
+*.pyc
+
+# Ignore the vagrant, molecule and testinfra temp files
+.vagrant
+.molecule
+.cache
+
+# Ignore the Ansible retry files
+*.retry
