@@ -31,64 +31,18 @@ bird_configs:
     protocols: "{{ bird_ipv6_protocols }}"
 
 bird_ipv4_includes: []
-bird_ipv4_filters: " {{bird_default_filters_ipv4}} "
+bird_ipv4_filters: {}
 bird_ipv4_protocols: "{{ bird_default_protocols }}"
 
 bird_ipv6_includes: []
-bird_ipv6_filters: "{{ bird_default_filters_ipv6 }}"
+bird_ipv6_filters: {}
 bird_ipv6_protocols: "{{ bird_default_protocols }}"
-
-bird_default_filters_ipv4:
-  only_test_addr_ipv4: "{{ bird_filters_only_test_addr }}"
-
-bird_filters_only_test_addr: |
-  if net ~ \[ 0.0.0.0/0 \] then accept;
-  reject;
-
-bird_default_filters_ipv6:
-  only_test_addr_ipv6: "{{ bird_filters_only_test_addr }}"
-
-bird_filters_only_test_addr: |
-  if net ~ \[ \:\:/0 \] then accept;
-  reject;
 
 bird_default_protocols:
   kernel: "{{ bird_protocols_kernel }}"
   device: "{{ bird_protocols_device }}"
-  direct: "{{ bird_protocols_direct }}"
-  bgp_rec1: "{{ bird_protocols_direct_bgp_Rec1 }}"
-  bgp_rec2: "{{ bird_protocols_direct_bgp_Rec2 }}"
-
 bird_protocols_kernel: |
-  metric 64;
-  export all;
+  scan time 60;
+  import none;
 bird_protocols_device: |
-  scan time 10;
-bird_protocols_direct: |
-  interface "*";
-  export none;
-  import all;
-
-# Declare a iBGP first peer
-# We only advertised the routes matching match_route()
-# which is handled by anycast_healthcheck, and only
-# accept the ones allowed by our "only_test_addr" ACL
-bird_protocols_direct_bgp_Rec1: |
-  import filter only_test_addr;
-  export where match_route();
-  local as AS_NUMBER;
-  neighbor IP as AS;
-  gateway recursive;
-  hold time 3;
-  keepalive time 1;
-
-# Declare a second iBGP peer, with the same rules than
-# the first one
-bird_protocols_direct_bgp_Rec2: |
-  import filter only_test_addr;
-  export where match_route();
-  local as AS_NUMBER;
-  neighbor IP as AS;
-  gateway recursive;
-  hold time 3;
-  keepalive time 1;
+  scan time 60;
