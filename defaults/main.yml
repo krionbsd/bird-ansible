@@ -35,7 +35,7 @@ bird_ipv4_filters: "{{ bird_default_filter_ipv4 }}"
 bird_ipv4_protocols: "{{ bird_default_protocols }}"
 
 bird_ipv6_includes: []
-bird_ipv6_filters: {}
+bird_ipv6_filters: "{{ bird_default_filter_ipv6 }}"
 bird_ipv6_protocols: "{{ bird_default_protocols }}"
 
 bird_default_filter_ipv4:
@@ -43,6 +43,13 @@ bird_default_filter_ipv4:
 test_addr: |
   # Only accept this exact network, to prevent mistakes
   if net ~ \[ 0.0.0.0/0 \] then accept;
+  reject;
+
+bird_default_filter_ipv6:
+  test_addr: "{{ test_addr }}"
+test_addr: |
+  # Only accept this exact network, to prevent mistakes
+  if net ~ \[ ::/0 \] then accept;
   reject;
 
 bird_default_protocols:
