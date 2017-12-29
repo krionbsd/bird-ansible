@@ -16,11 +16,6 @@ neighbor_as: 6789
 neighbor_ip1: 192.168.10.1
 neighbor_ip2: 192.168.20.1
 
-#local_as: "{{ local_as['12345'] }}"
-#neighbor_as: "{{ neighbor_as['54321'] }}"
-#neighbor_ip1: "{{ neighbor_ip1['192.168.1.1'] }}"
-#neighbor_ip2: "{{ neighbor_ip2['192.168.2.1'] }}"
-
 # Auto-enable bird/bird6 if an ipv4/ipv6 default route is present
 # Set to true/false to override auto detection
 bird_ipv4_enabled: detect
