@@ -7,7 +7,7 @@ bird_install_epel: True
 
 bird_package_state: latest
 
-bird_conf_dir: /etc/bird
+bird_conf_dir: /etc
 
 bird_router_id: "{{ ansible_default_ipv4['address'] }}"
 
@@ -31,18 +31,30 @@ bird_configs:
     protocols: "{{ bird_ipv6_protocols }}"
 
 bird_ipv4_includes: []
-bird_ipv4_filters: {}
+bird_ipv4_filters: "{{ bird_default_filter_ipv4 }}"
 bird_ipv4_protocols: "{{ bird_default_protocols }}"
 
 bird_ipv6_includes: []
 bird_ipv6_filters: {}
 bird_ipv6_protocols: "{{ bird_default_protocols }}"
 
+bird_default_filter_ipv4:
+  test_addr: "{{ test_addr }}"
+test_addr: |
+  # Only accept this exact network, to prevent mistakes
+  if net ~ \[ 0.0.0.0/0 \] then accept;
+  reject;
+
 bird_default_protocols:
+  direct: "{{ bird_protocols_direct }}"
   kernel: "{{ bird_protocols_kernel }}"
   device: "{{ bird_protocols_device }}"
+bird_protocols_direct: |
+  interface "*";
+  export none;
+  import all;
 bird_protocols_kernel: |
-  scan time 60;
-  import none;
+  metric 64;
+  export all;
 bird_protocols_device: |
-  scan time 60;
+  scan time 10;
