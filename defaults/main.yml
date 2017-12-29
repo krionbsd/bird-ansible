@@ -49,6 +49,8 @@ bird_default_protocols:
   direct: "{{ bird_protocols_direct }}"
   kernel: "{{ bird_protocols_kernel }}"
   device: "{{ bird_protocols_device }}"
+  bgp Rec1: "{{ bird_protocols_bgp1 }}"
+  bgp Rec2: "{{ bird_protocols_bgp2 }}"
 bird_protocols_direct: |
   interface "*";
   export none;
@@ -58,3 +60,26 @@ bird_protocols_kernel: |
   export all;
 bird_protocols_device: |
   scan time 10;
+bird_protocols_bgp1: |
+  # Declare a iBGP first peer
+  # We only advertised the routes matching match_route()
+  # which is handled by anycast_healthcheck, and only
+  # accept the ones allowed by our "only_test_addr" ACL
+  import filter test_addr;
+  export where match_route();
+  local as 64999;
+  neighbor 81.135.143.129 as 65113;
+  gateway recursive;
+  hold time 3;
+  keepalive time 1;
+bird_protocols_bgp2: |
+  # Declare a second iBGP peer, with the same rules than
+  # the first one
+  import filter test_addr;
+  export where match_route();
+  local as 64999;
+  neighbor 81.135.143.145 as 65113;
+  gateway recursive;
+  hold time 3;
+  keepalive time 1;
+
