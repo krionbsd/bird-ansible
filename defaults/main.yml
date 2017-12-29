@@ -11,6 +11,16 @@ bird_conf_dir: /etc
 
 bird_router_id: "{{ ansible_default_ipv4['address'] }}"
 
+local_as: 12345
+neighbor_as: 6789
+neighbor_ip1: 192.168.10.1
+neighbor_ip2: 192.168.20.1
+
+#local_as: "{{ local_as['12345'] }}"
+#neighbor_as: "{{ neighbor_as['54321'] }}"
+#neighbor_ip1: "{{ neighbor_ip1['192.168.1.1'] }}"
+#neighbor_ip2: "{{ neighbor_ip2['192.168.2.1'] }}"
+
 # Auto-enable bird/bird6 if an ipv4/ipv6 default route is present
 # Set to true/false to override auto detection
 bird_ipv4_enabled: detect
@@ -39,15 +49,15 @@ bird_ipv6_filters: "{{ bird_default_filter_ipv6 }}"
 bird_ipv6_protocols: "{{ bird_default_protocols }}"
 
 bird_default_filter_ipv4:
-  test_addr: "{{ test_addr }}"
-test_addr: |
+  test_addr_ipv4: "{{ test_addr_ipv4 }}"
+test_addr_ipv4: |
   # Only accept this exact network, to prevent mistakes
   if net ~ \[ 0.0.0.0/0 \] then accept;
   reject;
 
 bird_default_filter_ipv6:
-  test_addr: "{{ test_addr }}"
-test_addr: |
+  test_addr_ipv6: "{{ test_addr_ipv6 }}"
+test_addr_ipv6: |
   # Only accept this exact network, to prevent mistakes
   if net ~ \[ ::/0 \] then accept;
   reject;
@@ -72,20 +82,20 @@ bird_protocols_bgp1: |
   # We only advertised the routes matching match_route()
   # which is handled by anycast_healthcheck, and only
   # accept the ones allowed by our "only_test_addr" ACL
-  import filter test_addr;
+  import filter test_addr_ipv4;
   export where match_route();
-  local as 64999;
-  neighbor 81.135.143.129 as 65113;
+  local as {{ local_as }};
+  neighbor {{ neighbor_ip1 }} as {{ neighbor_as }};
   gateway recursive;
   hold time 3;
   keepalive time 1;
 bird_protocols_bgp2: |
   # Declare a second iBGP peer, with the same rules than
   # the first one
-  import filter test_addr;
+  import filter test_addr_ipv4;
   export where match_route();
-  local as 64999;
-  neighbor 81.135.143.145 as 65113;
+  local as {{ local_as }};
+  neighbor {{ neighbor_ip2 }} as {{ neighbor_as }};
   gateway recursive;
   hold time 3;
   keepalive time 1;
