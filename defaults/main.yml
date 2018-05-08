@@ -11,8 +11,8 @@ bird_conf_dir: /etc
 
 bird_router_id: "{{ ansible_default_ipv4['address'] }}"
 
-local_as: 12345
-neighbor_as: 6789
+local_as: 1234
+neighbor_as: 5678
 neighbor_ip1: 192.168.10.1
 neighbor_ip2: 192.168.20.1
 
